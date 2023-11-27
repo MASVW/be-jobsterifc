@@ -127,78 +127,86 @@ const routes = [
     
     
     //admin,
-    // {
- // Candidates
- {
-    method: 'GET',
-    path: '/api/admins/candidates',
-    handler: getCandidates,
-  },
-  {
-    method: 'PUT',
-    path: '/api/admins/candidates/:id_customer',
-    handler: updateCandidate,
-  },
-  {
-    method: 'PUT',
-    path: '/api/admins/candidates/:id_customer/reset-password',
-    handler: updateCandidatePassword,
-  },
-  {
-    method: 'PUT',
-    path: '/api/admins/batches/:id_batch/candidates/:id_customer/status',
-    handler: updateCandidateStatus,
-  },
-  {
-    method: 'DELETE',
-    path: '/api/candidates/:id_customer',
-    handler: deleteCandidate,
-  },
-
-  // process  Customers 
-  {
-    method: 'POST',
-    path: '/api/admins/customers',
-    handler: adminCreateCustomer,
-  },
-  {
-    method: 'GET',
-    path: '/api/admins/customers',
-    handler: adminGetCustomers,
-  },
-  {
-    method: 'PUT',
-    path: '/api/admins/customers/:id_customer',
-    handler: adminUpdateCustomer,
-  },
-  {
-    method: 'DELETE',
-    path: '/api/admins/customers/:id_customer',
-    handler: adminDeleteCustomer,
-  },
-
-  // Batches
-  {
-    method: 'POST',
-    path: '/api/admins/batches',
-    handler: createBatch,
-  },
-  {
-    method: 'GET',
-    path: '/api/admins/batches',
-    handler: getBatches,
-  },
-  {
-    method: 'PUT',
-    path: '/api/admins/batches/:id_batch',
-    handler: updateBatch,
-  },
-  {
-    method: 'DELETE',
-    path: '/api/admins/batches/:id_batch',
-    handler: deleteBatch,
-  },
-    // }
-];
-
+   {
+      method: 'GET',
+      path: '/api/admins',
+      handler: getAdmin,
+    },
+    {
+      method: 'POST',
+      path: '/api/admins/register',
+      handler: registerAdmin,
+    },
+    {
+      method: 'POST',
+      path: '/api/admins/login',
+      handler: loginAdmin,
+    },
+    {
+      method: 'GET',
+      path: '/api/admins/customers',
+      handler: AdmingetCustomers,
+    },
+    {
+      method: 'POST',
+      path: '/api/admins/batch',
+      handler: registerBatch,
+    },
+    {
+      method: 'GET',
+      path: '/api/admins/applyments',
+      handler: getApplyments,
+    },
+    {
+      method: 'GET',
+      path: '/api/admins/applyments/{applyId}',
+      handler: getApplyment,
+    },
+    {
+      method: 'GET',
+      path: '/api/admins/candidates',
+      handler: AdmingetCandidates,
+    },
+    {
+      method: 'PUT',
+      path: '/api/admins/candidates/{candidateId}',
+      handler: AdminupdateCandidate,
+    },
+    {
+      method: 'PUT',
+      path: '/api/admins/candidates/password/{candidateId}',
+      handler: AdminupdateCandidatePassword,
+    },
+    {
+      method: 'PUT',
+      path: '/api/admins/candidates/status/{candidateId}',
+      handler: AdminupdateCandidateStatus,
+    },
+    {
+      method: 'DELETE',
+      path: '/api/admins/candidates/{candidateId}',
+      handler: AdmindeleteCandidate,
+    },
+    {
+      method: 'POST',
+      path: '/api/admins/customers',
+      handler: AdmincreateCustomer,
+    },
+    {
+      method: 'PUT',
+      path: '/api/admins/customers/{customerId}',
+      handler: AdminupdateCustomer,
+    },
+    {
+      method: 'DELETE',
+      path: '/api/admins/customers/{customerId}',
+      handler: AdmindeleteCustomer,
+    },
+    {
+      method: 'POST',
+      path: '/api/admins/logout',
+      handler: logoutAdmin,
+    },
+  ];
+  
 module.exports = routes;
