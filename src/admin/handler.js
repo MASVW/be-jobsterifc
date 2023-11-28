@@ -99,14 +99,14 @@ const AdmingetCustomers = async (req, h) => {
     const page = req.query.page || 1;
     const per_page = req.query.per_page || 10;
 
-    const customers = await users.findAll({
-      where: { isCustomer: true },
-      orderBy: {
-        firstName: "asc",
-      },
-      limit: per_page,
-      offset: (page - 1) * per_page,
-    });
+const customers = await users.findAll({
+  where: { isCustomer: true },
+  order: [
+    ['firstName', 'ASC'],
+  ],
+  limit: per_page,
+  offset: (page - 1) * per_page,
+});
 
     return h.response(customers).code(200);
   } catch (err) {
@@ -498,7 +498,7 @@ const AdmindeleteCustomer = async (req, h) => {
       where: { id: customerId, isCustomer: true },
     });
 
-    return h.response({ message: "Candicate berhasil dihapus" }).code(200);
+    return h.response({ message: "Customer berhasil dihapus" }).code(200);
   } catch (err) {
     console.error("Terjadi kesalahan:", err);
     throw err;
