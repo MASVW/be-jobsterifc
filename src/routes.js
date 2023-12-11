@@ -1,5 +1,5 @@
 //routes boleh diisi disini yaa
-const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser} = require('./user/handler');
+const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch} = require('./user/handler');
 const {getResume, resume, deleteResume, parsePDF, parseAllPdf} = require('./resume/handler');
 const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID} = require('./applyment/handler');
 const {
@@ -74,6 +74,12 @@ const routes = [
         method: 'DELETE',
         path: "/api/users/logout",
         handler: logoutUser
+    },
+    {
+        //Get User
+        method: 'GET',
+        path: "/api/users/batch",
+        handler: getBatch
     },
 
 // Resume
