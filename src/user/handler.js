@@ -206,11 +206,13 @@ const getBatch = async (request, h) => {
     const user = await users.findOne({
       where: {
         email: userData.email,
+        token: token,
       },
     });
 
-    if (!user) {
-      return h.response({ message: 'Validation Error' }).code(400);
+    // Validate if customer and token are valid
+    if (!user || user.token !== token) {
+      return h.response({ message: 'Invalid token' }).code(401);
     }
 
     // If validation is successful, get all batches
