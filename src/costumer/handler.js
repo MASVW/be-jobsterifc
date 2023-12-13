@@ -42,7 +42,17 @@ const registerCustomer = async (req, h) => {
     } = req.payload;
 
     try {
-        // Membuat customer baru dengan isCustomer default sebagai true
+        if (!email.includes("@")) {
+            return h.response({ error: "Email tidak valid" }).code(400);
+        }
+        if (password.length < 8) {
+            return h.response({ error: "Password harus lebih dari 8 karakter" }).code(400);
+        }
+        const key = 'Jobsterific102723';
+        const encryptedData = encryptData(
+            password
+        , key);
+
         const newCustomer = await users.create({
             firstName,
             lastName,
@@ -51,20 +61,10 @@ const registerCustomer = async (req, h) => {
             website,
             phone,
             address,
-            password,
+            password: encryptedData,
             isCustomer: true,
         });
 
-        // Validasi data
-        if (!email.includes("@")) {
-            return h.response({ error: "Email tidak valid" }).code(400);
-        }
-
-        if (password.length < 8) {
-            return h.response({ error: "Password harus lebih dari 8 karakter" }).code(400);
-        }
-
-        // Mengembalikan data customer yang baru dibuat
         return newCustomer;
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
@@ -80,40 +80,41 @@ const loginCustomer = async (req, h) => {
     } = req.payload;
 
     try {
+        const key = 'Jobsterific102723';
         // Mencari customer di database berdasarkan email dan password
         const customer = await users.findOne({
             where: {
-                email: email,
-                password: password,
+                email: email
             }
         });
 
         if (!customer) {
-            return h.response({ message: 'Invalid email or password' }).code(400);
+            return h.response({ message: 'Validation Error' }).code(400);
         }
 
-        // Mengenkripsi data customer
-        const key = 'Jobsterific102723';
-        const encryptedData = encryptData({
-            email: customer.email,
-            password: customer.password,
-            firstName: customer.firstName
-        }, key);
+        const passwordDecrypt = decryptData(customer.password, key);
 
-        // Menyimpan token ke database
-        customer.token = encryptedData;
-        await customer.save();
+        if (password == passwordDecrypt){
+            const encryptedData = encryptData({
+                email: customer.email,
+                password: customer.password,
+                firstName: customer.firstName
+            }, key);
 
-        // Mengembalikan data terenkripsi
-        return h.response({ message: 'Success Login', customer }).code(200);
+            customer.token = encryptedData;
+            await customer.save();
 
+            return h.response({ message: 'Success Login', customer }).code(200);
+        }
+        else {
+            return h.response({ message: 'Password Invalid' }).code(400);
+        }
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error' }).code(400);
     }
 };
 
-// Fungsi untuk mengambil data customer berdasarkan ID
 const getCustomerById = async (req, h) => {
   const token = req.headers['token'];
 
@@ -121,7 +122,6 @@ const getCustomerById = async (req, h) => {
       const key = 'Jobsterific102723';
       const customerData = decryptData(token, key);
 
-      // Find customer by email and check if customer is valid
       const customer = await users.findOne({
           where: {
               email: customerData.email,

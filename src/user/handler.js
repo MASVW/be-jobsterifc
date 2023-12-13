@@ -77,7 +77,7 @@ const loginUser = async (request, h) => {
 
         const passwordDecrypt = decryptData(user.password, key);
 
-        if (password == passwordDecrypt.password) {
+        if (password == passwordDecrypt) {
             const encryptedData = encryptData({
                 email: user.email,
                 password: user.password,
@@ -89,9 +89,9 @@ const loginUser = async (request, h) => {
     
             return h.response({ message: `Success Login`, user}).code(200);
         }
-
-        console.error('Terjadi kesalahan:', err);
-        return h.response({ message: 'Validation Error' }).code(400);
+        else {
+            return h.response({ message: 'Password Invalid' }).code(400);
+        }
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error' }).code(400);
