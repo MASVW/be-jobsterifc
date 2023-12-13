@@ -33,11 +33,16 @@ const createUser = async (request, h) => {
     } = request.payload;
 
     try {
+        const key = 'Jobsterific102723';
+        const encryptedData = encryptData(
+            password
+        , key);
+
         await users.create({
             firstName, 
             lastName, 
             email, 
-            password, 
+            password: encryptedData, 
             job, 
             sex, 
             address,
@@ -58,10 +63,11 @@ const loginUser = async (request, h) => {
     } = request.payload;
 
     try {
+        const key = 'Jobsterific102723';
+        
         const user = await users.findOne({
             where: {
-                email: email,
-                password: password,
+                email: email
             }
         });
 
@@ -69,18 +75,23 @@ const loginUser = async (request, h) => {
             return h.response({ message: 'Validation Error' }).code(400);
         }
 
-        const key = 'Jobsterific102723';
-        const encryptedData = encryptData({
-            email: user.email,
-            password: user.password,
-            firstName: user.firstName
-        }, key);
+        const passwordDecrypt = decryptData(user.password, key);
 
-        user.token = encryptedData;
-        await user.save();
+        if (password == passwordDecrypt.password) {
+            const encryptedData = encryptData({
+                email: user.email,
+                password: user.password,
+                firstName: user.firstName
+            }, key);
+    
+            user.token = encryptedData;
+            await user.save();
+    
+            return h.response({ message: `Success Login`, user}).code(200);
+        }
 
-        return h.response({ message: `Success Login`, user}).code(200);
-
+        console.error('Terjadi kesalahan:', err);
+        return h.response({ message: 'Validation Error' }).code(400);
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error' }).code(400);

@@ -37,7 +37,10 @@ module.exports = (sequelize, DataTypes) => {
     isAdmin: DataTypes.BOOLEAN,
     status: DataTypes.BOOLEAN,
     job: DataTypes.STRING,
-    sex: DataTypes.ENUM('MALE','FEMALE'),
+    sex: {
+      type: DataTypes.ENUM('MALE','FEMALE'),
+      defaultValue: 'MALE'
+    },
     address: DataTypes.STRING,
     website: DataTypes.STRING,
     description: DataTypes.TEXT,

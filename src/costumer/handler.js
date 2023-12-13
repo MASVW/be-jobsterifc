@@ -301,8 +301,7 @@ const getCampaign = async (request, h) => {
 };
 
 // Fungsi untuk mengambil data campaign berdasarkan ID
-const getCampaignById = async (req, h) => {
-  const batchId = req.params.batchId
+const getCampaignByUserId = async (req, h) => {
   const token = req.headers['token'];
   try {
       const key = 'Jobsterific102723';
@@ -334,9 +333,8 @@ const getCampaignById = async (req, h) => {
           return h.response({ message: 'Validation Error' }).code(400);
       }
       // Ambil data campaign
-      const batch = await batchs.findOne({
+      const batch = await batchs.findAll({
           where: {
-              batchId: batchId,
               userId: customer.userId,
           },
       });
@@ -519,7 +517,7 @@ module.exports = {
     getCustomerById,
     updateCustomer,
     getCampaign,
-    getCampaignById,
+    getCampaignByUserId,
     createCampaign,
     updateCampaign,
     deleteCampaign,

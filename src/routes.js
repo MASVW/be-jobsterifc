@@ -26,7 +26,7 @@ const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID
 //     AdminupdateCustomer,
 //     AdmindeleteCustomer,
 //         } = require('./admin/handler');
-const {getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignById, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
+const {getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignByUserId, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
 const routes = [
     //user
     {
@@ -277,8 +277,8 @@ const routes = [
     },
     {
         method: "GET",
-        path: "/api/customers/campaigns/{batchId}",
-        handler: getCampaignById,
+        path: "/api/customers/allCampaign",
+        handler: getCampaignByUserId,
     },
     {
         method: "POST",
