@@ -302,8 +302,8 @@ const getCampaign = async (request, h) => {
 
 // Fungsi untuk mengambil data campaign berdasarkan ID
 const getCampaignById = async (req, h) => {
+  const batchId = req.params.batchId
   const token = req.headers['token'];
-
   try {
       const key = 'Jobsterific102723';
       const customerData = decryptData(token, key);
@@ -336,8 +336,8 @@ const getCampaignById = async (req, h) => {
       // Ambil data campaign
       const batch = await batchs.findOne({
           where: {
-              BatchId: batchId,
-              UserId: customer.userId,
+              batchId: batchId,
+              userId: customer.userId,
           },
       });
 
