@@ -1,4 +1,4 @@
-const { users } = require('../../models'); 
+const { users, batchs } = require('../../models'); 
 const CryptoJS = require('crypto-js');
 
 const encryptData = (data, key) => {
@@ -28,7 +28,8 @@ const createUser = async (request, h) => {
         password, 
         job, 
         sex, 
-        address
+        address,
+        phone
     } = request.payload;
 
     try {
@@ -39,7 +40,8 @@ const createUser = async (request, h) => {
             password, 
             job, 
             sex, 
-            address
+            address,
+            phone
         });
 
         return h.response({ message: 'Success Register' }).code(200);
@@ -132,11 +134,12 @@ const updateUser = async (request, h) => {
     const {
         firstName, 
         lastName, 
-        email,
+        email, 
         password, 
         job, 
         sex, 
-        address
+        address,
+        phone
     } = request.payload;
 
     try {
@@ -159,6 +162,7 @@ const updateUser = async (request, h) => {
         user.job = job;
         user.sex = sex;
         user.address = address;
+        user.phone = phone;
         await user.save();
 
         return h.response({ message: 'Success Update' , user}).code(200);
@@ -193,6 +197,40 @@ const logoutUser = async (request, h) => {
     }
 }
 
+// Mengambil seluruh data batch
+const getBatch = async (request, h) => {
+  const token = request.headers['token'];
+
+  try {
+    // Validate token
+    const key = 'Jobsterific102723';
+    const userData = decryptData(token, key);
+
+    const user = await users.findOne({
+      where: {
+        email: userData.email,
+        token: token,
+      },
+    });
+
+    // Validate if customer and token are valid
+    if (!user || user.token !== token) {
+      return h.response({ message: 'Invalid token' }).code(401);
+    }
+
+    // If validation is successful, get all batches
+    const batches = await batchs.findAll();
+
+    return h.response({ 
+        batches 
+    }).code(200);
+      
+  } catch (err) {
+    console.error('Error:', err);
+    return h.response({ message: 'Validation Error', error: err.message }).code(400);
+  }
+};
+
 module.exports = {
     getUser, 
     createUser, 
@@ -200,4 +238,5 @@ module.exports = {
     getCurrentUser,
     updateUser,
     logoutUser,
+    getBatch,
 };

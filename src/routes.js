@@ -1,5 +1,5 @@
 //routes boleh diisi disini yaa
-const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser} = require('./user/handler');
+const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch} = require('./user/handler');
 const {getResume, resume, deleteResume, parsePDF, parseAllPdf} = require('./resume/handler');
 const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID} = require('./applyment/handler');
 const {
@@ -34,6 +34,8 @@ const {
     getCustomerById,
     updateCustomer,
     createCampaign,
+    getCampaign,
+    getCampaignById,
     updateCampaign,
     deleteCampaign,
     customerLogout
@@ -74,6 +76,13 @@ const routes = [
         method: 'DELETE',
         path: "/api/users/logout",
         handler: logoutUser
+    },
+// Batch
+    {
+        //Get Batch
+        method: 'GET',
+        path: "/api/users/batch",
+        handler: getBatch
     },
 
 // Resume
@@ -267,9 +276,23 @@ const routes = [
         path: "/api/customers/{customerId}",
         handler: updateCustomer,
     },
+    {
+        method: "POST",
+        path: "/api/customers/logout",
+        handler: customerLogout,
+    },
 
 //campaign
-
+    {
+        method: 'GET',
+        path: '/api/customers/campaigns',
+        handler: getCampaign,
+    },
+    {
+        method: "GET",
+        path: "/api/customers/campaigns/{batchId}",
+        handler: getCampaignById,
+    },
     {
         method: "POST",
         path: "/api/customers/campaigns",
@@ -284,11 +307,6 @@ const routes = [
         method: "DELETE",
         path: "/api/customers/campaigns/{batchId}",
         handler: deleteCampaign,
-    },
-    {
-        method: "POST",
-        path: "/api/customers/logout",
-        handler: customerLogout,
     }
 ];
 
