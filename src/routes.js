@@ -2,6 +2,30 @@
 const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch} = require('./user/handler');
 const {getResume, resume, deleteResume, parsePDF, parseAllPdf} = require('./resume/handler');
 const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID} = require('./applyment/handler');
+// const {
+//     getAdmin,
+//     registerAdmin,
+//     loginAdmin,
+//     logoutAdmin,
+
+   
+//     AdminGetBatch,
+//     AdminUpdateBatch,
+//     AdminDeleteBatch,
+   
+
+//     AdmingetApplyments,
+//     AdminUpdateApplyment,
+//     AdminDeleteApplyment,
+
+//     AdmingetCandidates,
+//     AdminupdateCandidatePassword,
+//     AdmindeleteCandidate,
+
+//     AdmingetCustomers,
+//     AdminupdateCustomer,
+//     AdmindeleteCustomer,
+//         } = require('./admin/handler');
 const {getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignById, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
 const routes = [
     //user
