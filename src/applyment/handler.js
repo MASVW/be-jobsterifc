@@ -44,11 +44,39 @@ const createApplyment = async (request, h) => {
 //viewing all applyment, admin side
 const viewAllApplyment = async (request, h) => {
     try {
-    const apply = await applyments.findAll();
-    return h.response({ apply }).code(200);
+   
+        const applymentsData = await applyments.findAll();
+
+        const applymentsWithUserData = applymentsData.map(async (applyment) => {
+            const user = await users.findOne({
+                where: {
+                    userId: applyment.userId,
+                },
+            });
+            const applymentWithUser = {
+                applymentId: applyment.applymentId,
+                user: {
+                    userId: user.userId,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    job: user.job,
+                    sex: user.sex,
+                    address: user.address,
+                    website: user.website,
+                    description: user.description,
+                    phone: user.phone,
+            
+                },
+            };
+
+            return applymentWithUser;
+        });
+        const applymentsWithUserDataResolved = await Promise.all(applymentsWithUserData);
+        return h.response({ applyments: applymentsWithUserDataResolved }).code(200);
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
-        throw err;
+        return h.response({ message: 'Internal Server Error' }).code(500);
     }
 };
 
@@ -66,7 +94,7 @@ const viewApplymentByUID = async (request, h) => {
             }
         });
         
-        if (!user && user.email != userData.email) {
+        if (!user || user.email !== userData.email) {
             return h.response({ message: 'Validation Error' }).code(400);
         }
 
@@ -74,9 +102,30 @@ const viewApplymentByUID = async (request, h) => {
             where: {
                 userId: user.userId
             }
-        })
+        });
 
-        return h.response({ applyment }).code(200);
+        // Map the applyment data to include user information
+        const mappedApplyment = applyment.map(item => ({
+            applyId: item.applyId,
+            userId: item.userId,
+            batchId: item.batchId,
+            status: item.status,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+            user: {
+                userId: user.userId,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                job: user.job,
+                sex: user.sex,
+                address: user.address,
+                phone :user.phone,
+                
+            }
+        }));
+
+        return h.response({ applyment: mappedApplyment }).code(200);
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         throw err;
@@ -86,7 +135,8 @@ const viewApplymentByUID = async (request, h) => {
 //viewing all applyment by batch id @batch
 const viewApplymentByBID = async (request, h) => {
     const token = request.headers['token'];
-    const {batchId} =  request.payload;
+    const { batchId } = request.payload;
+
     try {
         const key = 'Jobsterific102723';
         const userData = decryptData(token, key);
@@ -96,16 +146,22 @@ const viewApplymentByBID = async (request, h) => {
                 email: userData.email,
             }
         });
-        
-        if (!user && user.email != userData.email) {
+
+        if (!user || user.email !== userData.email) {
             return h.response({ message: 'Validation Error' }).code(400);
         }
 
         const applyment = await applyments.findAll({
             where: {
                 batchId: batchId
-            }
-        })
+            },
+            include: [
+                {
+                    model: users,
+                    attributes: ['firstName', 'lastName', 'email', 'job', 'sex', 'address', 'phone'],
+                }
+            ]
+        });
 
         return h.response({ applyment }).code(200);
     } catch (err) {
@@ -113,6 +169,7 @@ const viewApplymentByBID = async (request, h) => {
         throw err;
     }
 };
+
 
 module.exports = {
     createApplyment,
