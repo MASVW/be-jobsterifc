@@ -1,6 +1,6 @@
 //routes boleh diisi disini yaa
 const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch} = require('./user/handler');
-const {getResume, resume, deleteResume, parsePDF, parseAllPdf} = require('./resume/handler');
+const {getResume, uploadResume, deleteResume, parsePDF, parseAllPdf} = require('./resume/handler');
 const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID} = require('./applyment/handler');
 // const {
 //     getAdmin,
@@ -27,6 +27,7 @@ const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID
 //     AdmindeleteCustomer,
 //         } = require('./admin/handler');
 const {getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignByUserId, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
+const {predictHandler} = require('./ml/handler');
 const routes = [
     //user
     {
@@ -78,13 +79,19 @@ const routes = [
         //Adding Resume
         method: 'POST',
         path: "/api/users/resume",
-        handler: resume
+        options: {
+            payload: {
+              output: 'stream',
+              parse: true,
+              multipart: true
+            }},
+        handler: uploadResume
     },
     {
         //Reupload Resume
         method: 'PUT',
         path: "/api/users/resume",
-        handler: resume
+        handler: uploadResume
     },
     {
         //Get Resume

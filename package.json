@@ -10,9 +10,13 @@
   "author": "CC-CH2-PR601",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/storage": "^7.7.0",
     "@hapi/hapi": "^21.3.2",
+    "@tensorflow/tfjs-node": "^4.15.0",
     "crypto-js": "^4.2.0",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.5",
+    "natural": "^6.10.4",
     "nodemon": "^3.0.1",
     "pdf-parse": "^1.1.1",
     "sequelize": "^6.35.1",

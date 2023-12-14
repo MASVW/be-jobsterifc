@@ -4,17 +4,17 @@ const routes = require('./routes');
 
 const init = async () => {
     const server = Hapi.server({
-        port: 443,
-        host: '0.0.0.0',
+        port: 3306,
+        host: 'localhost',
         routes: {
             cors: {
                 origin: ['*'],
             },
         },
-        tls: {
-            key: fs.readFileSync('/path/to/your/privkey.pem'),
-            cert: fs.readFileSync('/path/to/your/cert.pem')
-        }
+        // tls: {
+        //     key: fs.readFileSync('/path/to/your/privkey.pem'),
+        //     cert: fs.readFileSync('/path/to/your/cert.pem')
+        // }
     });
 
     server.route(routes);
