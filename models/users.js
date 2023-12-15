@@ -1,4 +1,5 @@
 'use strict';
+const { Trie } = require('natural');
 const {
   Model
 } = require('sequelize');
@@ -44,7 +45,11 @@ module.exports = (sequelize, DataTypes) => {
     address: DataTypes.STRING,
     website: DataTypes.STRING,
     description: DataTypes.TEXT,
-    phone: DataTypes.STRING
+    phone: DataTypes.STRING,
+    predict: {
+      type: DataTypes.JSON,
+      allowNull: true
+    }
   }, 
   {
     sequelize,

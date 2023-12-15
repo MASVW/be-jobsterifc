@@ -17,6 +17,9 @@ const client = new Storage({
 const bucketName = "demo-jobsterific";
 const bucket = client.bucket(bucketName);
 
+const { predictHandler } = require('../ml/handler');
+
+
 const decryptData = (ciphertext, key) => {
     const bytes = CryptoJS.AES.decrypt(ciphertext, key);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
@@ -41,7 +44,7 @@ const uploadResume = async (request, h) => {
         if (!user.token) {
             return h.response({ message: 'Validation Error' }).code(400);
         }
-        
+
         const fileExtension = resumeFile.hapi.filename.split('.').pop();
         const fileName = `${user.userId}-${user.firstName}-${Date.now()}.${fileExtension}`;
         const dir = `tmp/${fileName}`;
@@ -59,10 +62,20 @@ const uploadResume = async (request, h) => {
             await bucket.file(folderName).create({ directory: true });
         }
         await bucket.upload(dir, { destination: `${folderName}/${fileName}` });
-        console.log('Folder Bucket');
 
         user.resume = `https://storage.googleapis.com/${bucketName}/${folderName}/${fileName}`;
         fs.unlinkSync(dir);
+        await user.save();
+
+        const text = await parsePDF(user);
+        const predict = await predictHandler(text);
+
+        const dataArray = Object.entries(predict).map(([key, value]) => ({ key, value }));
+        dataArray.sort((a, b) => b.value - a.value);
+        const top10 = dataArray.slice(0, 10);
+        const result = top10.reduce((acc, cur) => {acc[cur.key] = cur.value; return acc;}, {});
+
+        user.predict = result;
         await user.save();
 
         return h.response({ message: 'Success Adding Resume' }).code(200);

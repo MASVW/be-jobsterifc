@@ -73,6 +73,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      predict: {
+        type: Sequelize.JSON,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

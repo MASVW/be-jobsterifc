@@ -1,6 +1,6 @@
 const { users, batchs } = require('../../models'); 
-const { predictHandler } = require('../ml/handler')
-const { parsePDF } = require('../resume/handler')
+const { predictHandler } = require('../ml/handler');
+const { parsePDF } = require('../resume/handler');
 const CryptoJS = require('crypto-js');
 
 const encryptData = (data, key) => {
@@ -215,40 +215,290 @@ const logoutUser = async (request, h) => {
     }
 }
 
-const getBatch = async (request, h) => {
-  const token = request.headers['token'];
+// const getBatch = async (request, h) => {
+//   const token = request.headers['token'];
 
-  try {
-    const key = 'Jobsterific102723';
-    const userData = decryptData(token, key);
+//   try {
+//     const key = 'Jobsterific102723';
+//     const userData = decryptData(token, key);
 
-    const user = await users.findOne({
-      where: {
-        email: userData.email,
-        token: token,
-      },
-    });
+//     const user = await users.findOne({
+//       where: {
+//         email: userData.email,
+//         token: token,
+//       },
+//     });
 
-    if (!user.token) {
-      return h.response({ message: 'Invalid token' }).code(401);
-    }
+//     if (!user.token) {
+//       return h.response({ message: 'Invalid token' }).code(401);
+//     }
 
-    if (!user.resume) {
-        const batches = await batchs.findAll();
+//     if (!user.predict) {
+//         const batches = await batchs.findAll();
+//         return h.response({ batches }).code(200);
+//     }
+//     else{
+//         const batches = await batchs.findAll();
+//         const text = await parsePDF(user);
+//         const predict = await predictHandler(text);
+
+//         const pdfTopValues = Object.entries(predict)
+//             .sort(([, a], [, b]) => b - a)
+//             .slice(0, 10)
+//             .map(([key]) => key);
+
+//         const sortedCampaigns = batches.map(campaign => {
+//             const campaignPredict = JSON.parse(campaign.predict);
+        
+//             const similarityScore = pdfTopValues.reduce(
+//                 (acc, key) => acc + (campaignPredict[key] || 0),
+//                 0
+//             );
+        
+//             return { ...campaign.dataValues, similarityScore };
+//         });
+        
+//         const resulst = sortedCampaigns.sort((a, b) => b.similarityScore - a.similarityScore);
+
+//         return h.response({ resulst }).code(200);
+//     }
+
+//   } catch (err) {
+//     console.error('Error:', err);
+//     return h.response({ message: 'Validation Error', error: err.message }).code(400);
+//   }
+// };
+
+//test 2
+// const getBatch = async (request, h) => {
+//     const token = request.headers['token'];
+  
+//     try {
+//       const key = 'Jobsterific102723';
+//       const userData = decryptData(token, key);
+  
+//       const user = await users.findOne({
+//         where: {
+//           email: userData.email,
+//           token: token,
+//         },
+//       });
+  
+//       if (!user.token) {
+//         return h.response({ message: 'Invalid token' }).code(401);
+//       }
+  
+//       const batches = await batchs.findAll();
+  
+//       if (!user.predict) {
+//         return h.response({ batches }).code(200);
+//       } else {
+//         const text = await parsePDF(user);
+//         const predict = await predictHandler(text);
+  
+//         const pdfTopValues = Object.entries(predict)
+//           .sort(([, a], [, b]) => b - a)
+//           .slice(0, 10)
+//           .map(([key]) => key);
+  
+//         const sortedCampaigns = batches.map(campaign => {
+//           const campaignPredict = JSON.parse(campaign.predict);
+  
+//           const similarityScore = pdfTopValues.reduce(
+//             (acc, key) => acc + (campaignPredict[key] || 0),
+//             0
+//           );
+  
+//           return { ...campaign.dataValues, similarityScore };
+//         });
+  
+//         const resulst = sortedCampaigns.sort((a, b) => b.similarityScore - a.similarityScore);
+  
+//         return h.response({ resulst }).code(200);
+//       }
+//     } catch (err) {
+//       console.error('Error:', err);
+//       return h.response({ message: 'Validation Error', error: err.message }).code(400);
+//     }
+//   };
+  
+  //tes 3
+//   const getBatch = async (request, h) => {
+//     const token = request.headers['token'];
+  
+//     try {
+//       const key = 'Jobsterific102723';
+//       const userData = decryptData(token, key);
+  
+//       const user = await users.findOne({
+//         where: {
+//           email: userData.email,
+//           token: token,
+//         },
+//       });
+  
+//       if (!user.token) {
+//         return h.response({ message: 'Invalid token' }).code(401);
+//       }
+  
+//       const batches = await batchs.findAll();
+  
+//       if (!user.predict) {
+//         return h.response({ batches }).code(200);
+//       } else {
+//         const text = await parsePDF(user);
+//         const predict = await predictHandler(text);
+  
+//         const getRecommendations = (userPredict, campaignPredicts) => {
+//           return campaignPredicts
+//             .map((campaignPredict, index) => ({
+//               index,
+//               score: userPredict.reduce((acc, val, i) => acc + val * campaignPredict[i], 0),
+//             }))
+//             .sort((a, b) => b.score - a.score)
+//             .map(item => batches[item.index]);
+//         };
+  
+//         const recommendations = getRecommendations(
+//           Object.values(JSON.parse(user.predict)),
+//           batches.map(campaign => Object.values(JSON.parse(campaign.predict)))
+//         );
+  
+//         return h.response({ recommendations }).code(200);
+//       }
+//     } catch (err) {
+//       console.error('Error:', err);
+//       return h.response({ message: 'Validation Error', error: err.message }).code(400);
+//     }
+//   };
+
+// Tes 4
+
+// const getBatch = async (request, h) => {
+//     const token = request.headers['token'];
+  
+//     try {
+//       const key = 'Jobsterific102723';
+//       const userData = decryptData(token, key);
+  
+//       const user = await users.findOne({
+//         where: {
+//           email: userData.email,
+//           token: token,
+//         },
+//       });
+  
+//       if (!user.token) {
+//         return h.response({ message: 'Invalid token' }).code(401);
+//       }
+  
+//       const batches = await batchs.findAll();
+  
+//       if (!user.predict) {
+//         return h.response({ batches }).code(200);
+//       } else {
+//         const text = await parsePDF(user);
+//         const predict = await predictHandler(text);
+  
+//         const getRecommendations = (userPredict, campaignPredicts) => {
+//           return batches
+//             .map(campaign => {
+//               const campaignPredict = JSON.parse(campaign.predict);
+//               const campaignPredictValues = Object.values(campaignPredict);
+  
+//               const score = userPredict.reduce((acc, val, i) => {
+//                 return acc + val * campaignPredictValues[i];
+//               }, 0);
+  
+//               return { ...campaign.dataValues, score };
+//             })
+//             .sort((a, b) => b.score - a.score);
+//         };
+  
+//         const recommendations = getRecommendations(
+//           Object.values(JSON.parse(user.predict)),
+//           batches.map(campaign => JSON.parse(campaign.predict))
+//         );
+  
+//         return h.response({ recommendations }).code(200);
+//       }
+//     } catch (err) {
+//       console.error('Error:', err);
+//       return h.response({ message: 'Validation Error', error: err.message }).code(400);
+//     }
+//   };
+
+  // tes 5
+
+  const getBatch = async (request, h) => {
+    const token = request.headers['token'];
+  
+    try {
+      const key = 'Jobsterific102723';
+      const userData = decryptData(token, key);
+  
+      const user = await users.findOne({
+        where: {
+          email: userData.email,
+          token: token,
+        },
+      });
+  
+      if (!user.token) {
+        return h.response({ message: 'Invalid token' }).code(401);
+      }
+  
+      const batches = await batchs.findAll();
+  
+      if (!user.predict) {
         return h.response({ batches }).code(200);
-    }
-    else{
+      } else {
         const text = await parsePDF(user);
         const predict = await predictHandler(text);
-        
-        return h.response({ predict }).code(200);
+  
+        const getRecommendations = (userPredict, campaignPredicts) => {
+            return batches
+              .map(campaign => {
+                const campaignPredict = JSON.parse(campaign.predict);
+                const campaignPredictValues = Object.values(campaignPredict);
+          
+                // Normalisasi userPredict dan campaignPredictValues
+                const maxUserPredict = Math.max(...userPredict);
+                const normalizedUserPredict = userPredict.map(val => val / maxUserPredict);
+          
+                const maxCampaignPredict = Math.max(...campaignPredictValues);
+                const normalizedCampaignPredict = campaignPredictValues.map(val => val / maxCampaignPredict);
+          
+                // Hitung skor dengan dot product
+                const dotProduct = normalizedUserPredict.reduce((acc, val, i) => {
+                  return acc + val * normalizedCampaignPredict[i];
+                }, 0);
+          
+                // Assign skor ke kampanye
+                return { ...campaign.dataValues, score: dotProduct };
+              })
+              .sort((a, b) => b.score - a.score);
+          };
+          
+          
+  
+        const recommendations = getRecommendations(
+          Object.values(JSON.parse(user.predict)),
+          batches.map(campaign => JSON.parse(campaign.predict))
+        );
+  
+        return h.response({ recommendations }).code(200);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      return h.response({ message: 'Validation Error', error: err.message }).code(400);
     }
+  };
+  
+  
+  
 
-  } catch (err) {
-    console.error('Error:', err);
-    return h.response({ message: 'Validation Error', error: err.message }).code(400);
-  }
-};
+
 
 module.exports = {
     getUser, 

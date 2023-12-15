@@ -1,6 +1,7 @@
 const { users, batchs } = require('../../models');
 const CryptoJS = require('crypto-js');
-const { predictHandler } = require('../ml/handler')
+const { predictHandler } = require('../ml/handler');
+const { where } = require('sequelize');
 
 // Fungsi untuk mengenkripsi data menggunakan AES
 const encryptData = (data, key) => {
@@ -255,8 +256,17 @@ const createCampaign = async (req, h) => {
     const text = `${campaignName} ${campaignDesc} ${campaignKeyword}`;
     const predict = await predictHandler(text);
 
-    console.log(predict);
-    // Create new campaign
+    const dataArray = Object.entries(predict).map(([key, value]) => ({ key, value }));
+
+    // Mengurutkan array objek berdasarkan nilai dalam urutan menurun
+    dataArray.sort((a, b) => b.value - a.value);
+
+    // Mengambil hanya 10 elemen pertama
+    const top10 = dataArray.slice(0, 10);
+
+    // Membuat objek kembali dari array hasil seleksi
+    const result = top10.reduce((acc, cur) => {acc[cur.key] = cur.value; return acc;}, {});
+
     const newCampaign = await batchs.create({
       userId: customer.userId,
       campaignName: campaignName,
@@ -264,7 +274,7 @@ const createCampaign = async (req, h) => {
       campaignPeriod: campaignPeriod,
       campaignKeyword: campaignKeyword,
       status: status,
-      predict: predict,
+      predict: result,
       startDate: startDate,
       endDate: endDate,
     });
@@ -363,6 +373,63 @@ const getCampaignByUserId = async (req, h) => {
       return h.response({ message: err.message || 'Internal server error' }).code(500);
   }
 };
+
+const getCandidates = async (request, h) => {
+    const token = request.headers['token'];
+  
+    try {
+      const key = 'Jobsterific102723';
+      const userData = decryptData(token, key);
+  
+      const user = await users.findOne({
+        where: {
+          email: userData.email,
+          token: token,
+          isCustomer: true
+        },
+      });
+  
+      if (!user) {
+        return h.response({ message: 'Validation Eror' }).code(401);
+      }
+      if (!user.token) {
+        return h.response({ message: 'Invalid token' }).code(401);
+      }
+  
+      if (!user.description) {
+          const candidattes = await users.findAll({where: {isCustomer: false, isAdmin: false}});
+          return h.response({ candidattes }).code(200);
+      }
+      else{
+          const candidates = await users.findAll({where: {predict: {[Sequelize.Op.not]: null}}});
+          const predict = await predictHandler(user.description);
+  
+          const pdfTopValues = Object.entries(predict)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 10)
+              .map(([key]) => key);
+  
+          const sortedCandidates = candidates.map(candidate => {
+              const campaignPredict = JSON.parse(candidate.predict);
+          
+              const similarityScore = pdfTopValues.reduce(
+                  (acc, key) => acc + (campaignPredict[key] || 0),
+                  0
+              );
+          
+              return { ...candidate.dataValues, similarityScore };
+          });
+          
+          const resulst = sortedCandidates.sort((a, b) => b.similarityScore - a.similarityScore);
+  
+          return h.response({ resulst }).code(200);
+      }
+  
+    } catch (err) {
+      console.error('Error:', err);
+      return h.response({ message: 'Validation Error', error: err.message }).code(400);
+    }
+  };
 
 // Fungsi untuk memperbarui data campaign yang ada
 const updateCampaign = async (req, h) => {
