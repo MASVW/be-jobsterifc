@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     campaignDesc: DataTypes.TEXT,
     campaignPeriod: DataTypes.DATE,
     campaignKeyword: DataTypes.STRING,
+    predict: DataTypes.JSON,
     status: DataTypes.BOOLEAN,
     startDate: DataTypes.DATE,
     endDate: DataTypes.DATE,

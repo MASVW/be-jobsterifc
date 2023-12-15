@@ -32,6 +32,10 @@ module.exports = {
       status: {
         type: Sequelize.BOOLEAN
       },
+      predict: {
+        allowNull: true,
+        type: Sequelize.JSON
+      },
       startDate: {
         allowNull: false,
         type: Sequelize.DATE

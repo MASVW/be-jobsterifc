@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const pdf = require('pdf-parse');
+const axios = require('axios');
 
 const { Storage } = require("@google-cloud/storage");
 const key = require("../../bucket.json");
@@ -120,85 +121,24 @@ const deleteResume = async (request, h) => {
         return h.response({ message: 'Validation Error', err}).code(400);
     }
 }
-const parsePDF = async (request, h) => {
-    const token = request.headers['token'];
+const parsePDF = async (user) => {
     try {
-        const key = 'Jobsterific102723';
-        const userData = decryptData(token, key);
-
-        const user = await users.findOne({
-            where: {
-                email: userData.email,
-            }
-        });
-
-        if (!user) {
-            return h.response({ message: 'Validation Error' }).code(400);
-        }
 
         const folder = `demo-jobsterific/users-resumes/${user.firstName}`
         const resume = user.resume;
         const fileName = path.basename(resume);
-
         const resumeUrl = await generateV4ReadSignedUrl(folder, fileName);
 
-        
+        const { data: pdfContent } = await axios.get(resumeUrl, { responseType: 'arraybuffer' });
 
-        return h.response({ message: 'Download successful' });
+        const data = await pdf(pdfContent);
+        const text = data.text.replace(/\n/g, ' ');
+
+        return text;
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error', err }).code(400);
     }
-}
-
-async function downloadFile(bucketName, fileName, localFilePath) {
-    const options = {
-        destination: localFilePath,
-    };
-
-    await client.bucket(bucketName).file(fileName).download(options);
-
-    console.log('Download completed');
-}
-
-
-const parseAllPdf = async (request, h) => {
-    try {
-        const usersData = await users.findAll();
-        //validation
-        if (!usersData) {
-            return h.response({ message: 'Validation Error' }).code(400);
-        }
-        
-        let allResumes = [];
-        for (let userData of usersData) {
-            // Jika resume null atau kosong, lanjutkan ke pengguna berikutnya
-            if (!userData.resume) {
-                continue;
-            }
-
-            const dataBuffer = fs.readFileSync(userData.resume);
-            const data = await pdf(dataBuffer);
-            const text = data.text.replace(/\n/g, ' ');
-
-            allResumes.push({ result: text });
-        }
-
-        return h.response({ message: "Success Parsing Resume" , resumes: allResumes}).code(200);
-
-    } catch (err) {
-        console.error('Terjadi kesalahan:', err);
-        return h.response({ message: 'Validation Error', err}).code(400);
-    }
-}
-async function downloadFile(bucketName, fileName, localFilePath) {
-    const options = {
-        destination: localFilePath,
-    };
-
-    await client.bucket(bucketName).file(fileName).download(options);
-
-    console.log('Download completed');
 }
 
 async function generateV4ReadSignedUrl(folder, fileName) {
@@ -217,11 +157,10 @@ async function generateV4ReadSignedUrl(folder, fileName) {
 
     return url;
   }
-
+ 
 module.exports = {
     getResume,
     uploadResume,
     deleteResume,
-    parsePDF,
-    parseAllPdf
+    parsePDF
 };

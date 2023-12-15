@@ -1,4 +1,6 @@
 const { users, batchs } = require('../../models'); 
+const { predictHandler } = require('../ml/handler')
+const { parsePDF } = require('../resume/handler')
 const CryptoJS = require('crypto-js');
 
 const encryptData = (data, key) => {
@@ -33,6 +35,13 @@ const createUser = async (request, h) => {
     } = request.payload;
 
     try {
+        const existingUser = await users.findOne({ where: { email } });
+
+        if (existingUser) {
+            // If email already exists, return a validation error
+            return h.response({ message: 'Email is already in use' }).code(400);
+        }
+        
         const key = 'Jobsterific102723';
         const encryptedData = encryptData(
             password
@@ -113,7 +122,7 @@ const getCurrentUser = async (request, h) => {
         });
 
         // Periksa apakah token di header sesuai dengan token yang masih ada di database
-        if (!user || user.token !== token) {
+        if (!user.token) {
             return h.response({ message: 'Validation Error' }).code(400);
         }
 
@@ -154,8 +163,6 @@ const updateUser = async (request, h) => {
     } = request.payload;
 
     try {
-        const key = 'Jobsterific102723';
-
         const user = await users.findOne({
             where: {
                 token: token,
@@ -208,12 +215,10 @@ const logoutUser = async (request, h) => {
     }
 }
 
-// Mengambil seluruh data batch
 const getBatch = async (request, h) => {
   const token = request.headers['token'];
 
   try {
-    // Validate token
     const key = 'Jobsterific102723';
     const userData = decryptData(token, key);
 
@@ -224,18 +229,21 @@ const getBatch = async (request, h) => {
       },
     });
 
-    // Validate if customer and token are valid
-    if (!user || user.token !== token) {
+    if (!user.token) {
       return h.response({ message: 'Invalid token' }).code(401);
     }
 
-    // If validation is successful, get all batches
-    const batches = await batchs.findAll();
+    if (!user.resume) {
+        const batches = await batchs.findAll();
+        return h.response({ batches }).code(200);
+    }
+    else{
+        const text = await parsePDF(user);
+        const predict = await predictHandler(text);
+        
+        return h.response({ predict }).code(200);
+    }
 
-    return h.response({ 
-        batches 
-    }).code(200);
-      
   } catch (err) {
     console.error('Error:', err);
     return h.response({ message: 'Validation Error', error: err.message }).code(400);

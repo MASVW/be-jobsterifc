@@ -1,5 +1,6 @@
 const { users, batchs } = require('../../models');
 const CryptoJS = require('crypto-js');
+const { predictHandler } = require('../ml/handler')
 
 // Fungsi untuk mengenkripsi data menggunakan AES
 const encryptData = (data, key) => {
@@ -47,6 +48,12 @@ const registerCustomer = async (req, h) => {
         }
         if (password.length < 8) {
             return h.response({ error: "Password harus lebih dari 8 karakter" }).code(400);
+        }
+        const existingUser = await users.findOne({ where: { email } });
+
+        if (existingUser) {
+            // If email already exists, return a validation error
+            return h.response({ message: 'Email is already in use' }).code(400);
         }
         const key = 'Jobsterific102723';
         const encryptedData = encryptData(
@@ -245,7 +252,10 @@ const createCampaign = async (req, h) => {
     if (!customer || customer.token !== token) {
       return h.response({ message: 'Invalid token' }).code(401);
     }
+    const text = `${campaignName} ${campaignDesc} ${campaignKeyword}`;
+    const predict = await predictHandler(text);
 
+    console.log(predict);
     // Create new campaign
     const newCampaign = await batchs.create({
       userId: customer.userId,
@@ -254,6 +264,7 @@ const createCampaign = async (req, h) => {
       campaignPeriod: campaignPeriod,
       campaignKeyword: campaignKeyword,
       status: status,
+      predict: predict,
       startDate: startDate,
       endDate: endDate,
     });
