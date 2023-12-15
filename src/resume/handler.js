@@ -2,12 +2,13 @@ const { users } = require('../../models');
 
 const CryptoJS = require('crypto-js');
 const fs = require('fs');
-const link = require('path');
+const path = require('path');
 
 const pdf = require('pdf-parse');
 
 const { Storage } = require("@google-cloud/storage");
 const key = require("../../bucket.json");
+const { log } = require('console');
 const client = new Storage({
     projectId: 'ninth-arena-403511',
     credentials: key,
@@ -19,9 +20,7 @@ const decryptData = (ciphertext, key) => {
     const bytes = CryptoJS.AES.decrypt(ciphertext, key);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 };
-//TBC
 const uploadResume = async (request, h) => {
-    
     const token = request.headers['token'];
     const key = 'Jobsterific102723';
     const userData = decryptData(token, key);
@@ -44,10 +43,10 @@ const uploadResume = async (request, h) => {
         
         const fileExtension = resumeFile.hapi.filename.split('.').pop();
         const fileName = `${user.userId}-${user.firstName}-${Date.now()}.${fileExtension}`;
-        const path = `tmp/${fileName}`;
+        const dir = `tmp/${fileName}`;
 
         console.log(fileName);
-        const fileStream = fs.createWriteStream(path);
+        const fileStream = fs.createWriteStream(dir);
 
         resumeFile.pipe(fileStream);
         
@@ -58,10 +57,11 @@ const uploadResume = async (request, h) => {
         } catch (error) {
             await bucket.file(folderName).create({ directory: true });
         }
-        await bucket.upload(path, { destination: `${folderName}/${fileName}` });
+        await bucket.upload(dir, { destination: `${folderName}/${fileName}` });
         console.log('Folder Bucket');
 
         user.resume = `https://storage.googleapis.com/${bucketName}/${folderName}/${fileName}`;
+        fs.unlinkSync(dir);
         await user.save();
 
         return h.response({ message: 'Success Adding Resume' }).code(200);
@@ -69,9 +69,6 @@ const uploadResume = async (request, h) => {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error', err}).code(400);
     } 
-    // finally {
-    //     fs.unlinkSync(path);
-    //   }
 }
 
 const getResume = async (request, h) => {
@@ -88,8 +85,13 @@ const getResume = async (request, h) => {
         if (!user.token) {
             return h.response({ message: 'Validation Error' }).code(400);
         }
-        return h.response({ resume: user.resume}).code(200);
+        
+        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const resume = user.resume;
+        const fileName = path.basename(resume);
 
+        const resumeUrl = await generateV4ReadSignedUrl(folder, fileName);
+        return h.response({ resume: resumeUrl });
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         return h.response({ message: 'Validation Error', err}).code(400);
@@ -134,12 +136,13 @@ const parsePDF = async (request, h) => {
             return h.response({ message: 'Validation Error' }).code(400);
         }
 
-        // const resume = `demo-jobsterific/users-resumes/${user.firstName}`;
-        const resume = `demo-jobsterific/users-resumes/Budi`;
-        const fileName = "11-Budi-1702537111986.pdf";
-        const localFilePath = `tmp/`;
+        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const resume = user.resume;
+        const fileName = path.basename(resume);
 
-        await downloadFile(resume, fileName, localFilePath);
+        const resumeUrl = await generateV4ReadSignedUrl(folder, fileName);
+
+        
 
         return h.response({ message: 'Download successful' });
     } catch (err) {
@@ -197,6 +200,23 @@ async function downloadFile(bucketName, fileName, localFilePath) {
 
     console.log('Download completed');
 }
+
+async function generateV4ReadSignedUrl(folder, fileName) {
+    // These options will allow temporary read access to the file
+    const options = {
+      version: 'v4',
+      action: 'read',
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+    };
+  
+    // Get a v4 signed URL for reading the file
+    const [url] = await client
+      .bucket(folder)
+      .file(fileName)
+      .getSignedUrl(options);
+
+    return url;
+  }
 
 module.exports = {
     getResume,
