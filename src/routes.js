@@ -27,14 +27,12 @@ const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID
 //     AdmindeleteCustomer,
 //         } = require('./admin/handler');
 const { getCandidates, getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignByUserId, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
-const {predictHandler} = require('./ml/handler');
 const routes = [
     //user
     {
         method: 'GET',
         path: '/',
-        // handler: getUser
-        handler: getCandidates
+        handler: getUser
     },
     {
         // CreateNew User
@@ -278,6 +276,11 @@ const routes = [
     },
 
 //campaign
+    {
+        method: 'GET',
+        path: '/api/customers/candidates',
+        handler: getCandidates
+    },
     {
         method: 'GET',
         path: '/api/customers/campaigns',

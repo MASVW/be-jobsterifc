@@ -13,40 +13,20 @@ module.exports = {
      * }], {});
     */
     return queryInterface.bulkInsert('users', [
-      {
-      firstName: 'Samuel',
-      lastName: 'Zakaria',
-      email: 'samuelzakaria3103@outlook.com',
-      password: 'Jobsterific',
-      job : 'Profesional Cloud Computing',
-      sex: 'MALE',
-      address: 'Jln Linggarjati no 5A',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
     {
-      firstName: "Samsung",
+      firstName: "Asus",
       lastName: "Company",
-      email: "samsung@samsung.co.id",
-      password: "budi",
-      isCustomer: "1",
+      email: "asus@gmail.com",
+      password: "U2FsdGVkX1/+AOJOGmu6bCL9Sec3AWhdm7mco/u2Weg=", //AsusDemo
+      isCustomer: true,
       sex: "MALE",
       address: "Jln Linggarjati no 5A",
-      website: "www.samsung.com",
+      website: "www.asus.com",
+      description: "Advanced Tech Co. is an innovative technology company dedicated to creating impactful digital solutions. /n We focus on developing products and services that leverage cutting-edge technologies such as Cloud Computing, Artificial Intelligence, and Machine Learning to help businesses and individuals navigate the digital world more efficiently and effectively. /n We believe that technology is the key to unlocking limitless potential and we are committed to bringing this technology into the hands of our customers. /n Our team consists of experienced and talented experts in various technology disciplines, dedicated to creating innovative, reliable, and sustainable solutions. /n At Advanced Tech Co., we strive to create an inclusive and diverse work environment, where every team member feels valued, respected, and empowered to reach their full potential. /n We believe that by working together, we can create technology that can change the world",
       phone: "+061782828",
       createdAt: new Date(),
       updatedAt: new Date()
-    },
-    {
-      firstName: "admin",
-      lastName: "admin",
-      email: "admin@gmail.com",
-      password: "admin",
-      isAdmin: "1",
-      sex: "MALE",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
+    }
   ]);
   },
 
