@@ -61,6 +61,20 @@ const registerCustomer = async (req, h) => {
             password
         , key);
 
+        const text = `${description}`;
+        const predict = await predictHandler(text);
+
+        const dataArray = Object.entries(predict).map(([key, value]) => ({ key, value }));
+
+        // Mengurutkan array objek berdasarkan nilai dalam urutan menurun
+        dataArray.sort((a, b) => b.value - a.value);
+
+        // Mengambil hanya 10 elemen pertama
+        const top10 = dataArray.slice(0, 10);
+
+        // Membuat objek kembali dari array hasil seleksi
+        const result = top10.reduce((acc, cur) => {acc[cur.key] = cur.value; return acc;}, {});
+
         const newCustomer = await users.create({
             firstName,
             lastName,
@@ -71,6 +85,7 @@ const registerCustomer = async (req, h) => {
             address,
             password: encryptedData,
             isCustomer: true,
+            predict: result,
         });
 
         return newCustomer;
@@ -401,30 +416,40 @@ const getCandidates = async (request, h) => {
           return h.response({ candidattes }).code(200);
       }
       else{
-          const candidates = await users.findAll({where: {predict: {[Sequelize.Op.not]: null}}});
-          const predict = await predictHandler(user.description);
-  
-          const pdfTopValues = Object.entries(predict)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 10)
-              .map(([key]) => key);
-  
-          const sortedCandidates = candidates.map(candidate => {
-              const campaignPredict = JSON.parse(candidate.predict);
+        
+          const candidates = await users.findAll({where: {isCustomer: false, isAdmin: false} });
+
+          const getRecommendations = (userPredict, candidatesPredicts) => {
+            return candidates
+              .map(candidate => {
+                const candidatePredict = JSON.parse(candidate.predict);
+                const candidatePredictValues = Object.values(candidatePredict);
           
-              const similarityScore = pdfTopValues.reduce(
-                  (acc, key) => acc + (campaignPredict[key] || 0),
-                  0
-              );
+                // Normalisasi userPredict dan campaignPredictValues
+                const maxUserPredict = Math.max(...userPredict);
+                const normalizedUserPredict = userPredict.map(val => val / maxUserPredict);
           
-              return { ...candidate.dataValues, similarityScore };
-          });
+                const maxCampaignPredict = Math.max(...candidatePredictValues);
+                const normalizedCampaignPredict = candidatePredictValues.map(val => val / maxCampaignPredict);
           
-          const resulst = sortedCandidates.sort((a, b) => b.similarityScore - a.similarityScore);
+                // Hitung skor dengan dot product
+                const dotProduct = normalizedUserPredict.reduce((acc, val, i) => {
+                  return acc + val * normalizedCampaignPredict[i];
+                }, 0);
+          
+                // Assign skor ke kampanye
+                return { ...candidate.dataValues, score: dotProduct };
+              })
+              .sort((a, b) => b.score - a.score);
+          };
+        
+        const recommendations = getRecommendations(
+          Object.values(JSON.parse(user.predict)),
+          candidates.map(candidates => JSON.parse(candidates.predict))
+        );
   
-          return h.response({ resulst }).code(200);
+        return h.response({ recommendations }).code(200);
       }
-  
     } catch (err) {
       console.error('Error:', err);
       return h.response({ message: 'Validation Error', error: err.message }).code(400);
@@ -600,4 +625,5 @@ module.exports = {
     updateCampaign,
     deleteCampaign,
     customerLogout,
+    getCandidates
 };

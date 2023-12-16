@@ -453,8 +453,6 @@ const logoutUser = async (request, h) => {
       if (!user.predict) {
         return h.response({ batches }).code(200);
       } else {
-        const text = await parsePDF(user);
-        const predict = await predictHandler(text);
   
         const getRecommendations = (userPredict, campaignPredicts) => {
             return batches
