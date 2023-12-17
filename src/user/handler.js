@@ -448,14 +448,15 @@ const logoutUser = async (request, h) => {
         return h.response({ message: 'Invalid token' }).code(401);
       }
   
-      const batches = await batchs.findAll();
-  
+      
       if (!user.predict) {
-        return h.response({ batches }).code(200);
-      } else {
-  
-        const getRecommendations = (userPredict, campaignPredicts) => {
-            return batches
+          const batches = await batchs.findAll();
+          return h.response({ batches }).code(200);
+        } else {
+            
+            const batch = await batchs.findAll();
+            const getRecommendations = (userPredict, campaignPredicts) => {
+            return batch
               .map(campaign => {
                 const campaignPredict = JSON.parse(campaign.predict);
                 const campaignPredictValues = Object.values(campaignPredict);
@@ -480,12 +481,12 @@ const logoutUser = async (request, h) => {
           
           
   
-        const recommendations = getRecommendations(
+        const batches = getRecommendations(
           Object.values(JSON.parse(user.predict)),
-          batches.map(campaign => JSON.parse(campaign.predict))
+          batch.map(campaign => JSON.parse(campaign.predict))
         );
   
-        return h.response({ recommendations }).code(200);
+        return h.response({ batches }).code(200);
       }
     } catch (err) {
       console.error('Error:', err);
