@@ -566,7 +566,7 @@ const deleteCampaign = async (req, h) => {
       const batch = await batchs.findOne({
           where: {
               batchId: batchId,
-              UserId: customer.userId,
+              userId: customer.userId,
           },
       });
 
