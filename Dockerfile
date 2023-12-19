@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-ENV NODE_ENV=test
+ENV NODE_ENV=development
 
 COPY . .
 

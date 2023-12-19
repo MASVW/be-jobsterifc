@@ -97,8 +97,8 @@ const viewApplymentByUID = async (request, h) => {
                 userId: user.userId
             }, 
             include: [{
-                model: users, 
-                as: 'user',
+                model: batchs, 
+                as: 'batch',
             }]
         });
 
