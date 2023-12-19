@@ -23,9 +23,6 @@ module.exports = {
       campaignDesc: {
         type: Sequelize.TEXT
       },
-      campaignPeriod: {
-        type: Sequelize.DATE
-      },
       campaignKeyword: {
         type: Sequelize.STRING
       },

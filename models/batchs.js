@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     campaignName: DataTypes.STRING,
     campaignDesc: DataTypes.TEXT,
-    campaignPeriod: DataTypes.DATE,
     campaignKeyword: DataTypes.STRING,
     predict: DataTypes.JSON,
     status: DataTypes.BOOLEAN,
