@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sunlit-descent-406802",
+  "private_key_id": "7473fa732c8eb9958dd4fb600c5102adb23d288d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCQLKQOMha+SxbW\nV/hb0sm2phbOEJwFMr7L1ggt0j+7RLstvonZ9qwrtssMJoovb0vf6XNa3wHvVafo\nOniriX1SryEexdXrY4FiWWsexBldEJP05ToK8F02/Ks2lzMu+UVlYMv2pThyx5PL\nPiehiXV9/MYcbg/3Z2CrtXH67M3ekgec/XjxXWJa30yIkH//6GXkEHqywgxVUOgm\nycc9Buh4ee/unzxSy0Q/WggR2/SAsATit2I/+cCQTxt+RA6q/lUU2mpbSxx44D5l\nBS9oN4QTQmXDqEjgrJtDlgLo+nbGTm3E66ZGBVtuxgCR2v2sGWlbvtzmnH6AmRGV\neE0HT7r7AgMBAAECggEAAxjoIREV+rXd1Kkkb7CRFc0TNsY6biAomireKa+ORIVx\nREYZkC/2Fe4LKs26lUBwD8e/ogdY4RR3N8MwGXa8MLh6TJpMuUTre5XpMNzxMtX9\nH7s7heo1l5a/4E3bZWxyNkiySQuyDK7rpowzEnloTB+ra1CCSJZwmm+/P1OOUPQ6\nDdSyQEvVnX4qoa7cCoL2dJM0f3GzVeEsfUF3Wn/1HgRWuCQjNuRR1543t5QsLHPy\nw8qzEiKR1Q14j6Gzextx5xb484ZXiVb4VkYwRzM9M092sBZjn5ujrXrmbIlL1Y8h\nhOdwJTPcvxm1RuyIsCEAJYs0eHJMHPB4W6B9hrT8VQKBgQDFbIE0TSuhnI8sWokl\n8uPuLIvkMRcJfHZDfuUnDT67kFbn35dQeR+6T2x68dLZ9hQg3hCXZq5xInrnZrbw\nnlS7owSTC1aIUlXoIEsMF5WhPSOyolPKSYY8K0L7K8tfD2I4OsPr8VVuJjSxgsid\nTga8Po4a8wO6id9VZuyDhpoqXQKBgQC684cZEbDaduT+ZnY2dkt6LXtT05+EpPDP\nnm7itzZ4rndyhbZb5w3daEYXnFj/NJ8SccR33JfuNQEytardWpAkSiD0TSK9Hp3g\nlOvbtUvzpX1/P4Z/ZWyb2wjMEnxkkBvfZilAXS4FPVDISarlctGmF7XuPOpX3QH/\nE5/MnCMVNwKBgDGmgjAHIGv6lb9P3aIfndcueNggyGxoUs3Swgq6OAav3EtgXgut\nCp+ujde1rZOHYbSKZJ3PAxwM0eAUYvnMt/6gluvsNA0At/4y8OzPmZ/9YlbwoCYF\nq67CKoxEjVcQ5WDC1rcl8JhNH39tJsr47pS1HsQETfHB7trpkZ3aYjc5AoGAWxP5\nZUUxG72Aok/Yl3/aFZPC2Xvn4v9YMk3FR75qUzDsEGcECJHwN0VtoGMTGIHSXXH/\nfUWC3xIDm2jV7TEJuCRFGb/ahLg9wgPLRCZ28iRVl4CjTb1jxCpZhtIauANdEOD8\nh9bdbMAKcwkwsMfXS0uR3pbetB9/sX0mBNCsZtECgYEAu5unAbZx6qHkS4Rt/xgN\nNz9eQDc+HxkQolnUpX+cn6Wmh1cnwd9yiXcCn9j3WLnGS/lJmdvUyioF1hRi32uF\n1nTddfScYnCgQp+pmE6bfGO4f6LPzL8VHnL0720ZTyj/MpOgcWUoGBOwwlIJUqrt\nCpoOQgqrEC347K8x3azEtLQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "be-jobsterific@sunlit-descent-406802.iam.gserviceaccount.com",
+  "client_id": "114624928025631945470",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/be-jobsterific%40sunlit-descent-406802.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
