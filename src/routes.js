@@ -1,32 +1,8 @@
 //routes boleh diisi disini yaa
-const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch} = require('./user/handler');
+const {getUser, createUser, loginUser, getCurrentUser, logoutUser, updateUser, getBatch, searchBatch} = require('./user/handler');
 const {getResume, uploadResume, deleteResume, parsePDF} = require('./resume/handler');
 const {createApplyment, viewAllApplyment, viewApplymentByUID, viewApplymentByBID} = require('./applyment/handler');
-// const {
-//     getAdmin,
-//     registerAdmin,
-//     loginAdmin,
-//     logoutAdmin,
-
-   
-//     AdminGetBatch,
-//     AdminUpdateBatch,
-//     AdminDeleteBatch,
-   
-
-//     AdmingetApplyments,
-//     AdminUpdateApplyment,
-//     AdminDeleteApplyment,
-
-//     AdmingetCandidates,
-//     AdminupdateCandidatePassword,
-//     AdmindeleteCandidate,
-
-//     AdmingetCustomers,
-//     AdminupdateCustomer,
-//     AdmindeleteCustomer,
-//         } = require('./admin/handler');
-const { getCandidates, getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignByUserId, updateCampaign, deleteCampaign, customerLogout} = require("./costumer/handler");
+const { getCandidates, getCustomer, registerCustomer, loginCustomer, getCustomerById, updateCustomer, createCampaign, getCampaign, getCampaignByUserId, updateCampaign, deleteCampaign, customerLogout, getCandidatesSpecified} = require("./costumer/handler");
 const routes = [
     //user
     {
@@ -71,9 +47,13 @@ const routes = [
         path: "/api/users/batch",
         handler: getBatch
     },
-
+    {
+        //Search Batch
+        method: 'GET',
+        path: "/api/users/batch/search",
+        handler: searchBatch
+    },
 // Resume
-
     {
         //Adding Resume
         method: 'POST',
@@ -144,106 +124,8 @@ const routes = [
         handler: viewApplymentByBID
     },
 
-    
-// //admin,
-//     {
-//         // getting Admin
-//         method: 'GET',
-//         path: '/api/admin',
-//         handler: getAdmin,
-//     },
-//     {
-//         method: 'POST',
-//         path: '/api/admins/register',
-//         handler: registerAdmin,
-//     },
-//     {
-//         method: 'POST',
-//         path: '/api/admins/login',
-//         handler: loginAdmin,
-//     },
-//     {
-//         method: 'POST',
-//         path: '/api/admins/logout',
-//         handler: logoutAdmin,
-//     },
-   
-
-// ////Batch Admin
-
-
-//     {
-//         method: 'GET',
-//         path: '/api/admins/batch',
-//         handler: AdminGetBatch,
-//     },
-//     {
-//         method: 'PUT',
-//         path: '/api/admins/batch/{batchId}',
-//         handler: AdminUpdateBatch,
-//     },
-//     {
-//         method: 'DELETE',
-//         path: '/api/admins/batch/{batchId}',
-//         handler: AdminDeleteBatch,
-//     },
-
-
-// ////Applyments Admin
-//     {
-//         method: 'GET',
-//         path: '/api/admins/applyments',
-//         handler: AdmingetApplyments,
-//     },
-//     {
-//         method: 'PUT',
-//         path: '/api/admins/applyments/{applyId}',
-//         handler: AdminUpdateApplyment,
-//     },
-//      {
-//         method: 'DELETE',
-//         path: '/api/admins/applyments/{applyId}',
-//         handler: AdminDeleteApplyment,
-
-//     },
-
-// ////Candidate Admin
-//     {
-//         method: 'GET',
-//         path: '/api/admins/candidates',
-//         handler: AdmingetCandidates,
-//     },
- 
-//     {
-//         method: 'PUT',
-//         path: '/api/admins/candidates/password/{candidateId}',
-//         handler: AdminupdateCandidatePassword,
-//     },
-//     {
-//         method: 'DELETE',
-//         path: '/api/admins/candidates/{candidateId}',
-//         handler: AdmindeleteCandidate,
-//     },
-
-//     ////Costumer Admin
- 
-//     {
-//         method: 'GET',
-//         path: '/api/admins/customers',
-//         handler: AdmingetCustomers,
-//     },
-//     {
-//         method: 'PUT',
-//         path: '/api/admins/customers/{customerId}',
-//         handler: AdminupdateCustomer,
-//     },
-//     {
-//         method: 'DELETE',
-//         path: '/api/admins/customers/{customerId}',
-//         handler: AdmindeleteCustomer,
-//     },
-
     //Costumer
+    
     {
         method: "GET",
         path: "/api/customers",
@@ -280,6 +162,11 @@ const routes = [
         method: 'GET',
         path: '/api/customers/candidates',
         handler: getCandidates
+    },
+    {
+        method: 'GET',
+        path: '/api/customers/campaigns/candidate/{userId}',
+        handler: getCandidatesSpecified
     },
     {
         method: 'GET',

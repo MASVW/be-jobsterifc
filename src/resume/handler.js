@@ -111,6 +111,18 @@ const getResume = async (request, h) => {
         return h.response({ message: 'Validation Error', err}).code(400);
     }
 }
+const getResumeforCustomer = async (user) => {
+    try {
+        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const resume = user.resume;
+        const fileName = path.basename(resume);
+
+        const resumeUrl = await generateV4ReadSignedUrl(folder, fileName);
+        return resumeUrl;
+    } catch (err) {
+        return h.response({ message: 'Terjadi kesalahan', err}).code(400);
+    }
+}
 const deleteResume = async (request, h) => {
     const token = request.headers['token'];
     try {
@@ -159,7 +171,7 @@ async function generateV4ReadSignedUrl(folder, fileName) {
     const options = {
       version: 'v4',
       action: 'read',
-      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
     };
   
     // Get a v4 signed URL for reading the file
@@ -175,5 +187,6 @@ module.exports = {
     getResume,
     uploadResume,
     deleteResume,
-    parsePDF
+    parsePDF,
+    getResumeforCustomer
 };

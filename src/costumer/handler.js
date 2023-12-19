@@ -2,6 +2,7 @@ const { users, batchs } = require('../../models');
 const CryptoJS = require('crypto-js');
 const { predictHandler } = require('../ml/handler');
 const { where } = require('sequelize');
+const { getResumeforCustomer } = require('../resume/handler');
 
 // Fungsi untuk mengenkripsi data menggunakan AES
 const encryptData = (data, key) => {
@@ -19,9 +20,6 @@ const getCustomer = async () => {
     try {
         const customersData = await users.findAll({
             where: { isCustomer: true },
-            order: [
-                ['firstName', 'ASC'],
-            ],
         });
         return customersData;
     } catch (err) {
@@ -352,20 +350,7 @@ const getCampaignByUserId = async (req, h) => {
       });
 
       // Periksa apakah token di header sesuai dengan token yang masih ada di database
-      if (!customer || customer.token !== token) {
-          return h.response({ message: 'Validation Error' }).code(400);
-      }
-
-      // Periksa apakah token masih ada di dalam tabel user_token
-      const userToken = await users.findOne({
-          where: {
-              userId: customer.userId,
-              token: token,
-          }
-      });
-
-      if (!userToken) {
-          // Token tidak ditemukan, mungkin sudah logout
+      if (!customer.token) {
           return h.response({ message: 'Validation Error' }).code(400);
       }
       // Ambil data campaign
@@ -455,6 +440,52 @@ const getCandidates = async (request, h) => {
       return h.response({ message: 'Validation Error', error: err.message }).code(400);
     }
   };
+
+  const getCandidatesSpecified = async (request, h) => {
+    const token = request.headers['token'];
+    const userId  = request.params.userId;
+
+    try {
+        console.log(userId);
+        const key = 'Jobsterific102723';
+        const userData = decryptData(token, key);
+
+        const user = await users.findOne({
+            where: {
+                email: userData.email,
+                token: token,
+                isCustomer: true
+            }
+        });
+
+        // Periksa apakah token di header sesuai dengan token yang masih ada di database
+        if (!user.token) {
+            return h.response({ message: 'Validation Error' }).code(400);
+        }
+
+        // Periksa apakah token masih ada di dalam tabel user token
+        const specifiedUser = await users.findOne({
+            where: {
+                userId: userId,
+            }
+        });
+
+        if (!specifiedUser) {
+            // Token tidak ditemukan, mungkin sudah logout
+            return h.response({ message: 'Not Found Candidates' }).code(400);
+        }
+
+        const resume = await getResumeforCustomer(specifiedUser);
+
+        return h.response({
+            specifiedUser, resume
+        }).code(200);
+
+    } catch (err) {
+        console.error('Terjadi kesalahan:', err);
+        return h.response({ message: 'Validation Error', err }).code(400);
+    }
+};
 
 // Fungsi untuk memperbarui data campaign yang ada
 const updateCampaign = async (req, h) => {
@@ -625,5 +656,6 @@ module.exports = {
     updateCampaign,
     deleteCampaign,
     customerLogout,
-    getCandidates
+    getCandidates,
+    getCandidatesSpecified
 };
