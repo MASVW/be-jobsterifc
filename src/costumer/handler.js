@@ -3,6 +3,8 @@ const CryptoJS = require('crypto-js');
 const { predictHandler } = require('../ml/handler');
 const { where } = require('sequelize');
 const { getResumeforCustomer } = require('../resume/handler');
+const { Op } = require('sequelize');
+
 
 // Fungsi untuk mengenkripsi data menggunakan AES
 const encryptData = (data, key) => {
@@ -390,48 +392,46 @@ const getCandidates = async (request, h) => {
       });
   
       if (!user) {
-        return h.response({ message: 'Validation Eror' }).code(401);
+        return h.response({ message: 'Validation Error' }).code(401);
       }
       if (!user.token) {
         return h.response({ message: 'Invalid token' }).code(401);
       }
   
       if (!user.description) {
-          const candidattes = await users.findAll({where: {isCustomer: false, isAdmin: false}});
-          return h.response({ candidattes }).code(200);
-      }
-      else{
-        
-          const candidates = await users.findAll({where: {isCustomer: false, isAdmin: false} });
-
-          const getRecommendations = (userPredict, candidatesPredicts) => {
-            return candidates
-              .map(candidate => {
-                const candidatePredict = JSON.parse(candidate.predict);
-                const candidatePredictValues = Object.values(candidatePredict);
-          
-                // Normalisasi userPredict dan campaignPredictValues
-                const maxUserPredict = Math.max(...userPredict);
-                const normalizedUserPredict = userPredict.map(val => val / maxUserPredict);
-          
-                const maxCampaignPredict = Math.max(...candidatePredictValues);
-                const normalizedCampaignPredict = candidatePredictValues.map(val => val / maxCampaignPredict);
-          
-                // Hitung skor dengan dot product
-                const dotProduct = normalizedUserPredict.reduce((acc, val, i) => {
-                  return acc + val * normalizedCampaignPredict[i];
-                }, 0);
-          
-                // Assign skor ke kampanye
-                return { ...candidate.dataValues, score: dotProduct };
-              })
-              .sort((a, b) => b.score - a.score);
-          };
-        
-        const recommendations = getRecommendations(
-          Object.values(JSON.parse(user.predict)),
-          candidates.map(candidates => JSON.parse(candidates.predict))
-        );
+        const candidates = await users.findAll({ where: { isCustomer: false, isAdmin: false } });
+        return h.response({ candidates }).code(200);
+      } else {
+        const candidates = await users.findAll({ where: { isCustomer: false, isAdmin: false } });
+  
+        const getRecommendations = (userPredict, candidatesData) => {
+          return candidatesData
+            .map(candidate => {
+              // Check if candidate.predict is defined before parsing
+              const candidatePredict = candidate.predict ? JSON.parse(candidate.predict) : null;
+              const candidatePredictValues = Object.values(candidatePredict || {});
+  
+              // Normalization and dot product calculation
+              const maxUserPredict = Math.max(...userPredict);
+              const normalizedUserPredict = userPredict.map(val => val / maxUserPredict);
+  
+              const maxCandidatePredict = Math.max(...candidatePredictValues);
+              const normalizedCandidatePredict = candidatePredictValues.map(val => val / maxCandidatePredict);
+  
+              // Calculate dot product, considering null predict as 0
+              const dotProduct = candidate.predict
+                ? normalizedUserPredict.reduce((acc, val, i) => acc + val * normalizedCandidatePredict[i], 0)
+                : 0;
+  
+              return { ...candidate.dataValues, score: dotProduct };
+            })
+            .sort((a, b) => b.score - a.score);
+        };
+  
+        // Check if user.predict is defined before parsing
+        const userPredict = user.predict ? Object.values(JSON.parse(user.predict)) : [];
+  
+        const recommendations = getRecommendations(userPredict, candidates);
   
         return h.response({ recommendations }).code(200);
       }
@@ -440,13 +440,13 @@ const getCandidates = async (request, h) => {
       return h.response({ message: 'Validation Error', error: err.message }).code(400);
     }
   };
+  
 
   const getCandidatesSpecified = async (request, h) => {
     const token = request.headers['token'];
     const userId  = request.params.userId;
 
     try {
-        console.log(userId);
         const key = 'Jobsterific102723';
         const userData = decryptData(token, key);
 
@@ -475,6 +475,12 @@ const getCandidates = async (request, h) => {
             return h.response({ message: 'Not Found Candidates' }).code(400);
         }
 
+        if (!specifiedUser.resume){
+            return h.response({
+                message: 'User has not uploaded the resume',
+                specifiedUser
+            }).code(200);
+        }
         const resume = await getResumeforCustomer(specifiedUser);
 
         return h.response({
