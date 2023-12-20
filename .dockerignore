@@ -1,2 +1,6 @@
 node_modules/
 README2.txt
+*cloud-sql-proxy.exe
+*docker-compose.yml
+*db-config.json
+db/

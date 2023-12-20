@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const fs = require('fs');
 const routes = require('./routes');

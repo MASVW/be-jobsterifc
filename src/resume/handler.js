@@ -1,4 +1,5 @@
 const { users } = require('../../models'); 
+require('dotenv').config();
 
 const CryptoJS = require('crypto-js');
 const fs = require('fs');
@@ -8,13 +9,12 @@ const pdf = require('pdf-parse');
 const axios = require('axios');
 
 const { Storage } = require("@google-cloud/storage");
-const key = require("../../bucket.json");
-const { log } = require('console');
+const key = require("../../key.json");
 const client = new Storage({
-    projectId: 'ninth-arena-403511',
+    projectId: process.env.PROJECT_ID,
     credentials: key,
   });
-const bucketName = "demo-jobsterific";
+const bucketName = process.env.BUCKET_NAME || "jobsterific";
 const bucket = client.bucket(bucketName);
 
 const { predictHandler } = require('../ml/handler');
@@ -100,7 +100,7 @@ const getResume = async (request, h) => {
             return h.response({ message: 'Validation Error' }).code(400);
         }
         
-        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const folder = `${process.env.BUCKET_NAME}/users-resumes/${user.firstName}`
         const resume = user.resume;
         const fileName = path.basename(resume);
 
@@ -113,7 +113,7 @@ const getResume = async (request, h) => {
 }
 const getResumeforCustomer = async (user) => {
     try {
-        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const folder = `${process.env.BUCKET_NAME}/users-resumes/${user.firstName}`
         const resume = user.resume;
         const fileName = path.basename(resume);
 
@@ -149,7 +149,7 @@ const deleteResume = async (request, h) => {
 const parsePDF = async (user) => {
     try {
 
-        const folder = `demo-jobsterific/users-resumes/${user.firstName}`
+        const folder = `${process.env.BUCKET_NAME}/users-resumes/${user.firstName}`
         const resume = user.resume;
         const fileName = path.basename(resume);
         const resumeUrl = await generateV4ReadSignedUrl(folder, fileName);
@@ -179,7 +179,6 @@ async function generateV4ReadSignedUrl(folder, fileName) {
       .bucket(folder)
       .file(fileName)
       .getSignedUrl(options);
-
     return url;
   }
  
